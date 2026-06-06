@@ -25,6 +25,7 @@ class _ContactSectionState extends State<ContactSection> {
   PhoneNumber? phoneNumber;
   String? completePhoneNumber;
   bool isPhoneValid = false;
+  bool isSubmitting = false;
 
   final List<String> departments = const [
     'Sales',
@@ -44,7 +45,7 @@ class _ContactSectionState extends State<ContactSection> {
     super.dispose();
   }
 
-    // ─── Reset entire form ─────────────────────────────────────────────────────
+  // ─── Reset entire form ─────────────────────────────────────────────────────
   void _resetForm() {
     _formKey.currentState?.reset();
     firstNameController.clear();
@@ -53,19 +54,24 @@ class _ContactSectionState extends State<ContactSection> {
     phoneController.clear();
     messageController.clear();
     setState(() {
-      selectedDepartment  = null;
+      selectedDepartment = null;
       completePhoneNumber = null;
-      isPhoneValid        = false;
-      phoneNumber         = null;
+      isPhoneValid = false;
+      phoneNumber = null;
+      isSubmitting = false;
     });
   }
 
   Future<void> submitForm() async {
+    if (isSubmitting) {
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    if (!isPhoneValid || (completePhoneNumber?.trim().isEmpty == true)) {
+    if (!isPhoneValid || (completePhoneNumber?.trim().isEmpty ?? true)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter a valid phone number.'),
@@ -74,6 +80,10 @@ class _ContactSectionState extends State<ContactSection> {
       );
       return;
     }
+
+    setState(() {
+      isSubmitting = true;
+    });
 
     const String googleScriptUrl =
         'https://script.google.com/macros/s/AKfycbwiBzYa52UCUkaUHJazb-ls9cWJB_nQwZRYfSj2RPeitD8iTGSUN7J2fxpI9ZfGEI0X/exec';
@@ -88,8 +98,11 @@ class _ContactSectionState extends State<ContactSection> {
           'phoneNumber': completePhoneNumber ?? '',
           'department': selectedDepartment ?? '',
           'message': messageController.text.trim(),
+          'formType': 'contact'
         },
       );
+
+      if (!mounted) return;
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -109,12 +122,20 @@ class _ContactSectionState extends State<ContactSection> {
         );
       }
     } catch (error) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: $error'),
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSubmitting = false;
+        });
+      }
     }
   }
 
@@ -276,13 +297,14 @@ class _ContactSectionState extends State<ContactSection> {
                           const SizedBox(height: 28),
                           SizedBox(
                             width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: submitForm,
-                              icon: const Icon(Icons.send),
-                              label: const Text('Send Message'),
+                            child: ElevatedButton(
+                              onPressed: isSubmitting ? null : submitForm,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
+                                disabledBackgroundColor:
+                                    AppColors.primary.withOpacity(0.65),
                                 foregroundColor: Colors.white,
+                                disabledForegroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 24,
                                   vertical: 20,
@@ -294,6 +316,37 @@ class _ContactSectionState extends State<ContactSection> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.w800,
                                 ),
+                              ),
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 250),
+                                child: isSubmitting
+                                    ? const Row(
+                                        key: ValueKey('loading'),
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.4,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          SizedBox(width: 12),
+                                          Text('Sending...'),
+                                        ],
+                                      )
+                                    : const Row(
+                                        key: ValueKey('normal'),
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.send),
+                                          SizedBox(width: 10),
+                                          Text('Send Message'),
+                                        ],
+                                      ),
                               ),
                             ),
                           ),

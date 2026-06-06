@@ -18,7 +18,7 @@ class _ServicesSectionState extends State<ServicesSection>
     ServiceData(
       title: 'Flight Booking',
       shortText: 'Best fares from trusted airlines worldwide.',
-      image: 'assets/images/flight-booking.jpg',
+      image: 'images/flight_booking.png',
       icon: Icons.flight_takeoff,
       heading:
           'Find the best rates for both domestic and international flights.',
@@ -35,7 +35,7 @@ class _ServicesSectionState extends State<ServicesSection>
     ServiceData(
       title: 'Hotel Booking',
       shortText: 'Book domestic and international hotels easily.',
-      image: 'assets/images/hotel-booking.jpg',
+      image: 'images/hotel_booking.png',
       icon: Icons.hotel,
       heading:
           'Domestic and international hotels available on one simple platform.',
@@ -52,7 +52,7 @@ class _ServicesSectionState extends State<ServicesSection>
     ServiceData(
       title: 'Group Booking',
       shortText: 'Flexible travel solutions for groups of all sizes.',
-      image: 'assets/images/group-booking.jpg',
+      image: 'images/group_image.png',
       icon: Icons.groups,
       heading: 'Group bookings made simple for all group sizes.',
       description:
@@ -364,7 +364,7 @@ class _ServiceImageCard extends StatelessWidget {
           children: [
             Image.asset(
               service.image,
-              fit: BoxFit.cover,
+              fit: BoxFit.fill,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
                   decoration: const BoxDecoration(
@@ -386,59 +386,20 @@ class _ServiceImageCard extends StatelessWidget {
               },
             ),
 
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.black.withOpacity(0.55),
-                    Colors.black.withOpacity(0.08),
-                  ],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                ),
-              ),
-            ),
+            // Container(
+            //   decoration: BoxDecoration(
+            //     gradient: LinearGradient(
+            //       colors: [
+            //         Colors.black.withOpacity(0.55),
+            //         Colors.black.withOpacity(0.08),
+            //       ],
+            //       begin: Alignment.bottomCenter,
+            //       end: Alignment.topCenter,
+            //     ),
+            //   ),
+            // ),
 
-            Positioned(
-              left: 22,
-              right: 22,
-              bottom: 22,
-              child: Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.92),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      height: 46,
-                      width: 46,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(
-                        service.icon,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Text(
-                        service.expertise,
-                        style: const TextStyle(
-                          color: AppColors.dark,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+            ],
         ),
       ),
     );
@@ -487,45 +448,45 @@ class _ServiceTextContent extends StatelessWidget {
               .toList(),
         ),
 
-        const SizedBox(height: 28),
+        // const SizedBox(height: 28),
 
-        Row(
-          children: [
-            ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.arrow_forward),
-              label: const Text('Get Started'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 18,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-            ),
-            const SizedBox(width: 14),
-            OutlinedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.support_agent),
-              label: const Text('Talk to Us'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 18,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-            ),
-          ],
-        ),
+        // Row(
+        //   children: [
+        //     ElevatedButton.icon(
+        //       onPressed: () {},
+        //       icon: const Icon(Icons.arrow_forward),
+        //       label: const Text('Get Started'),
+        //       style: ElevatedButton.styleFrom(
+        //         backgroundColor: AppColors.primary,
+        //         foregroundColor: Colors.white,
+        //         padding: const EdgeInsets.symmetric(
+        //           horizontal: 22,
+        //           vertical: 18,
+        //         ),
+        //         shape: RoundedRectangleBorder(
+        //           borderRadius: BorderRadius.circular(14),
+        //         ),
+        //       ),
+        //     ),
+        //     const SizedBox(width: 14),
+        //     OutlinedButton.icon(
+        //       onPressed: () {},
+        //       icon: const Icon(Icons.support_agent),
+        //       label: const Text('Talk to Us'),
+        //       style: OutlinedButton.styleFrom(
+        //         foregroundColor: AppColors.primary,
+        //         side: const BorderSide(color: AppColors.primary),
+        //         padding: const EdgeInsets.symmetric(
+        //           horizontal: 22,
+        //           vertical: 18,
+        //         ),
+        //         shape: RoundedRectangleBorder(
+        //           borderRadius: BorderRadius.circular(14),
+        //         ),
+        //       ),
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }

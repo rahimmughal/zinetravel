@@ -27,80 +27,77 @@ class PhoneFieldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InternationalPhoneNumberInput(
-      onInputChanged: onInputChanged,
-      onInputValidated: onInputValidated,
-      selectorConfig: const SelectorConfig(
-        selectorType: PhoneInputSelectorType.DROPDOWN,
-        showFlags: true,
-        useEmoji: true,
-      ),
-      ignoreBlank: false,
-      autoValidateMode: AutovalidateMode.onUserInteraction,
-      selectorTextStyle: const TextStyle(
-        color: AppColors.text,
-        fontWeight: FontWeight.w600,
-      ),
-      initialValue: initialValue ??
-          PhoneNumber(
-            isoCode: initialCountryCode,
-          ),
-      textFieldController: controller,
-      formatInput: true,
-      keyboardType: const TextInputType.numberWithOptions(
-        signed: false,
-        decimal: false,
-      ),
-      inputDecoration: InputDecoration(
-        labelText: label,
-        hintText: hintText,
-        filled: true,
-        fillColor: const Color(0xFFF8FBFF),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 18,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: Color(0xFFDCE8F7),
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: Color(0xFFDCE8F7),
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: AppColors.primary,
-            width: 1.6,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: Colors.redAccent,
-          ),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: Colors.redAccent,
-            width: 1.6,
-          ),
+    return Container(
+      height: 58,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FBFF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFDCE8F7),
+          width: 1,
         ),
       ),
-      validator: validator ??
-          (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Phone number is required';
-            }
+      child: InternationalPhoneNumberInput(
+        onInputChanged: onInputChanged,
+        onInputValidated: onInputValidated,
+        selectorConfig: const SelectorConfig(
+          selectorType: PhoneInputSelectorType.DROPDOWN,
+          showFlags: true,
+          useEmoji: true,
+          trailingSpace: false,
+        ),
+        ignoreBlank: false,
+        autoValidateMode: AutovalidateMode.onUserInteraction,
+        selectorTextStyle: const TextStyle(
+          color: AppColors.text,
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+        ),
+        initialValue: initialValue ??
+            PhoneNumber(
+              isoCode: initialCountryCode,
+            ),
+        textFieldController: controller,
+        formatInput: true,
+        keyboardType: const TextInputType.numberWithOptions(
+          signed: false,
+          decimal: false,
+        ),
+        spaceBetweenSelectorAndTextField: 8,
+        inputBorder: InputBorder.none,
+        inputDecoration: InputDecoration(
+          labelText: label,
+          hintText: hintText,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
+          filled: false,
+          isDense: true,
+          contentPadding: const EdgeInsets.only(
+            top: 14,
+            bottom: 10,
+          ),
+          labelStyle: const TextStyle(
+            color: AppColors.muted,
+            fontSize: 14,
+          ),
+          hintStyle: const TextStyle(
+            color: AppColors.muted,
+            fontSize: 14,
+          ),
+        ),
+        validator: validator ??
+            (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Phone number is required';
+              }
 
-            return null;
-          },
+              return null;
+            },
+      ),
     );
   }
 }

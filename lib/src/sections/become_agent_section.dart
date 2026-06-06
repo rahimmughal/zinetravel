@@ -3,6 +3,7 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import '../theme/colors.dart';
 import '../widgets/phone_field_widget.dart';
+import 'package:http/http.dart' as http;
 
 class BecomeAgentSection extends StatefulWidget {
   final bool isPopup;
@@ -28,6 +29,7 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
   bool isPasswordVisible = false;
   bool isPhoneValid = false;
   String completePhoneNumber = '';
+  bool isSubmitting = false;
 
   @override
   void dispose() {
@@ -43,7 +45,11 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
     super.dispose();
   }
 
-  void submitForm() {
+  Future<void> submitAgentForm() async {
+    if (isSubmitting) {
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -58,28 +64,64 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
       return;
     }
 
-    final agentData = {
-      'companyName': companyNameController.text.trim(),
-      'firstName': firstNameController.text.trim(),
-      'lastName': lastNameController.text.trim(),
-      'address': addressController.text.trim(),
-      'city': cityController.text.trim(),
-      'postCode': postCodeController.text.trim(),
-      'email': emailController.text.trim(),
-      'phoneNumber': completePhoneNumber,
-      'password': passwordController.text.trim(),
-    };
+    setState(() {
+      isSubmitting = true;
+    });
 
-    debugPrint(agentData.toString());
+    const String googleScriptUrl =
+        'https://script.google.com/macros/s/AKfycbwiBzYa52UCUkaUHJazb-ls9cWJB_nQwZRYfSj2RPeitD8iTGSUN7J2fxpI9ZfGEI0X/exec';
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Agent registration submitted successfully.'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(googleScriptUrl),
+        body: {
+          'formType': 'agent',
+          'companyName': companyNameController.text.trim(),
+          'firstName': firstNameController.text.trim(),
+          'lastName': lastNameController.text.trim(),
+          'address': addressController.text.trim(),
+          'city': cityController.text.trim(),
+          'postCode': postCodeController.text.trim(),
+          'email': emailController.text.trim(),
+          'phoneNumber': completePhoneNumber,
+        },
+      );
 
-    clearForm();
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Agent registration submitted successfully.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        clearForm();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed. Status code: ${response.statusCode}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSubmitting = false;
+        });
+      }
+    }
   }
 
   void clearForm() {
@@ -107,11 +149,11 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
     return Container(
       width: double.infinity,
       padding: widget.isPopup
-    ? EdgeInsets.zero
-    : EdgeInsets.symmetric(
-        horizontal: isMobile ? 18 : 54,
-        vertical: isMobile ? 42 : 70,
-      ),
+          ? EdgeInsets.zero
+          : EdgeInsets.symmetric(
+              horizontal: isMobile ? 18 : 54,
+              vertical: isMobile ? 42 : 70,
+            ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -205,9 +247,7 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
               ),
             ),
           ),
-
           const SizedBox(height: 16),
-
           const Text(
             'Welcome to Zine Travel',
             textAlign: TextAlign.left,
@@ -218,9 +258,7 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
               height: 1.15,
             ),
           ),
-
           const SizedBox(height: 10),
-
           const Text(
             'Create your agent account and start accessing flights, hotels, group bookings, and dedicated travel support.',
             style: TextStyle(
@@ -229,18 +267,14 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
               height: 1.6,
             ),
           ),
-
           const SizedBox(height: 28),
-
           _AgentTextField(
             controller: companyNameController,
             label: 'Company Name *',
             icon: Icons.business_outlined,
             validator: requiredValidator('Company name is required'),
           ),
-
           const SizedBox(height: 16),
-
           _ResponsiveFormRow(
             left: _AgentTextField(
               controller: firstNameController,
@@ -255,18 +289,35 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
               validator: requiredValidator('Last name is required'),
             ),
           ),
-
           const SizedBox(height: 16),
-
+          _AgentTextField(
+            controller: emailController,
+            label: 'Email *',
+            icon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
+            validator: emailValidator,
+          ),
+          const SizedBox(height: 16),
+          PhoneFieldWidget(
+            controller: phoneController,
+            label: 'Phone Number *',
+            hintText: 'Enter phone number',
+            initialCountryCode: 'GB',
+            onInputChanged: (PhoneNumber number) {
+              completePhoneNumber = number.phoneNumber ?? '';
+            },
+            onInputValidated: (bool isValid) {
+              isPhoneValid = isValid;
+            },
+          ),
+          const SizedBox(height: 16),
           _AgentTextField(
             controller: addressController,
             label: 'Address *',
             icon: Icons.location_on_outlined,
             validator: requiredValidator('Address is required'),
           ),
-
           const SizedBox(height: 16),
-
           _ResponsiveFormRow(
             left: _AgentTextField(
               controller: cityController,
@@ -281,64 +332,12 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
               validator: requiredValidator('PostCode is required'),
             ),
           ),
-
-          const SizedBox(height: 16),
-
-          _AgentTextField(
-            controller: emailController,
-            label: 'Email *',
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-            validator: emailValidator,
-          ),
-
-          const SizedBox(height: 16),
-
-          PhoneFieldWidget(
-            controller: phoneController,
-            label: 'Phone Number *',
-            hintText: 'Enter phone number',
-            initialCountryCode: 'GB',
-            onInputChanged: (PhoneNumber number) {
-              completePhoneNumber = number.phoneNumber ?? '';
-            },
-            onInputValidated: (bool isValid) {
-              isPhoneValid = isValid;
-            },
-          ),
-
-          const SizedBox(height: 16),
-
-          _AgentTextField(
-            controller: passwordController,
-            label: 'Password *',
-            icon: Icons.lock_outline,
-            obscureText: !isPasswordVisible,
-            suffixIcon: IconButton(
-              onPressed: () {
-                setState(() {
-                  isPasswordVisible = !isPasswordVisible;
-                });
-              },
-              icon: Icon(
-                isPasswordVisible
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                color: AppColors.muted,
-              ),
-            ),
-            validator: passwordValidator,
-          ),
-
           const SizedBox(height: 24),
-
           SizedBox(
             width: double.infinity,
             height: 56,
-            child: ElevatedButton.icon(
-              onPressed: submitForm,
-              icon: const Icon(Icons.arrow_forward_rounded),
-              label: const Text('Create Agent Account'),
+            child: ElevatedButton(
+              onPressed: isSubmitting ? null : submitAgentForm,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -350,6 +349,35 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
                 ),
+              ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: isSubmitting
+                    ? const Row(
+                        key: ValueKey('loading'),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.4,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Text('Submitting...'),
+                        ],
+                      )
+                    : const Row(
+                        key: ValueKey('normal'),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.arrow_forward_rounded),
+                          SizedBox(width: 10),
+                          Text('Join Us'),
+                        ],
+                      ),
               ),
             ),
           ),
@@ -434,7 +462,6 @@ class _BecomeAgentVisual extends StatelessWidget {
               );
             },
           ),
-
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -447,7 +474,6 @@ class _BecomeAgentVisual extends StatelessWidget {
               ),
             ),
           ),
-
           Positioned(
             top: 32,
             left: 32,
@@ -471,7 +497,6 @@ class _BecomeAgentVisual extends StatelessWidget {
               ],
             ),
           ),
-
           Center(
             child: Container(
               height: 92,
@@ -490,7 +515,6 @@ class _BecomeAgentVisual extends StatelessWidget {
               ),
             ),
           ),
-
           Positioned(
             left: 28,
             right: 28,

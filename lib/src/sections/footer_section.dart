@@ -39,7 +39,7 @@ class FooterSection extends StatelessWidget {
                         children: [
                           _socialIcon(Icons.facebook),
                           _socialIcon(Icons.camera_alt),
-                          _socialIcon(Icons.link),
+                          // _socialIcon(Icons.link),
                         ],
                       ),
                     ],
@@ -63,7 +63,7 @@ class FooterSection extends StatelessWidget {
                     '0128 2901770',
                     '+44 7821 391065',
                     'Zine Travel LTD',
-                    'United Kingdom',
+                    '200a Every St, Nelson BB9 7JB, UK',
                   ],
                 ),
               ],

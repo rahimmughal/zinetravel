@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -55,6 +57,57 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey _aboutKey = GlobalKey();
   final GlobalKey _servicesKey = GlobalKey();
   final GlobalKey _contactKey = GlobalKey();
+
+  bool _showTopBar = true;
+  Timer? _scrollStopTimer;
+
+  static const double _topBarSpace = 112;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController.addListener(_handleScroll);
+  }
+
+  void _handleScroll() {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+
+    final offset = _scrollController.offset;
+
+    if (offset <= 10) {
+      _scrollStopTimer?.cancel();
+
+      if (!_showTopBar) {
+        setState(() {
+          _showTopBar = true;
+        });
+      }
+
+      return;
+    }
+
+    if (_showTopBar) {
+      setState(() {
+        _showTopBar = false;
+      });
+    }
+
+    _scrollStopTimer?.cancel();
+
+    _scrollStopTimer = Timer(
+      const Duration(milliseconds: 420),
+      () {
+        if (mounted) {
+          setState(() {
+            _showTopBar = true;
+          });
+        }
+      },
+    );
+  }
 
   void _scrollTo(GlobalKey key) {
     final context = key.currentContext;
@@ -117,7 +170,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-
               Positioned(
                 top: 12,
                 right: 12,
@@ -151,6 +203,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    _scrollStopTimer?.cancel();
+    _scrollController.removeListener(_handleScroll);
     _scrollController.dispose();
     super.dispose();
   }
@@ -159,7 +213,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: _buildDrawer(context),
-
       floatingActionButton: FloatingActionButton(
         onPressed: _openWhatsApp,
         backgroundColor: const Color(0xFF25D366),
@@ -174,50 +227,63 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        child: Column(
-          children: [
-            TopBar(
-              onAbout: () => _scrollTo(_aboutKey),
-              onServices: () => _scrollTo(_servicesKey),
-              onContact: () => _scrollTo(_contactKey),
-              onRegister: _openBecomeAgentPopup,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              children: [
+                const SizedBox(height: _topBarSpace),
+                HeroSection(
+                  onContact: () => _scrollTo(_contactKey),
+                  onRegister: _openBecomeAgentPopup,
+                ),
+                const WelcomeSection(),
+                Container(
+                  key: _servicesKey,
+                  child: const ServicesSection(),
+                ),
+                Container(
+                  key: _contactKey,
+                  child: const ContactSection(),
+                ),
+                CtaBanner(
+                  onBecomeAgent: _openBecomeAgentPopup,
+                ),
+                const WhyChooseUs(),
+                Container(
+                  key: _aboutKey,
+                  child: const FooterSection(),
+                ),
+              ],
             ),
-
-            HeroSection(
-              onContact: () => _scrollTo(_contactKey),
-              onRegister: _openBecomeAgentPopup,
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AnimatedSlide(
+              offset: _showTopBar ? Offset.zero : const Offset(0, -1.1),
+              duration: const Duration(milliseconds: 320),
+              curve: Curves.easeOutCubic,
+              child: AnimatedOpacity(
+                opacity: _showTopBar ? 1 : 0,
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+                child: Material(
+                  elevation: 8,
+                  shadowColor: Colors.black.withOpacity(0.12),
+                  child: TopBar(
+                    onAbout: () => _scrollTo(_aboutKey),
+                    onServices: () => _scrollTo(_servicesKey),
+                    onContact: () => _scrollTo(_contactKey),
+                    onRegister: _openBecomeAgentPopup,
+                  ),
+                ),
+              ),
             ),
-
-            const WelcomeSection(),
-
-            // Removed BecomeAgentSection from main page.
-            // It will now open only as a popup.
-
-            Container(
-              key: _servicesKey,
-              child: const ServicesSection(),
-            ),
-
-            Container(
-              key: _contactKey,
-              child: const ContactSection(),
-            ),
-
-            CtaBanner(
-              onBecomeAgent: _openBecomeAgentPopup,
-            ),
-
-            const WhyChooseUs(),
-
-            Container(
-              key: _aboutKey,
-              child: const FooterSection(),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
