@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zinetravel/src/sections/become_agent_section.dart';
 import 'package:zinetravel/src/sections/contact_us_section.dart';
 
 import 'theme/colors.dart';
@@ -50,12 +51,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
+
   final GlobalKey _aboutKey = GlobalKey();
   final GlobalKey _servicesKey = GlobalKey();
   final GlobalKey _contactKey = GlobalKey();
 
   void _scrollTo(GlobalKey key) {
     final context = key.currentContext;
+
     if (context != null) {
       Scrollable.ensureVisible(
         context,
@@ -65,42 +68,113 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _openWhatsApp() async {
+    const phoneNumber = '447821391065';
+    const message = 'Hello Zine Travel, I need travel booking assistance.';
+
+    final Uri whatsappUrl = Uri.parse(
+      'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}',
+    );
+
+    if (!await launchUrl(
+      whatsappUrl,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not open WhatsApp');
+    }
+  }
+
+  void _openBecomeAgentPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        final screenWidth = MediaQuery.of(dialogContext).size.width;
+        final screenHeight = MediaQuery.of(dialogContext).size.height;
+        final isMobile = screenWidth < 700;
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 14 : 32,
+            vertical: isMobile ? 18 : 32,
+          ),
+          child: Stack(
+            children: [
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: 1250,
+                  maxHeight: screenHeight * 0.92,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(37),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: const SingleChildScrollView(
+                  child: BecomeAgentSection(
+                    isPopup: true,
+                  ),
+                ),
+              ),
+
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Material(
+                  color: Colors.white,
+                  shape: const CircleBorder(),
+                  elevation: 6,
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () {
+                      Navigator.pop(dialogContext);
+                    },
+                    child: const SizedBox(
+                      height: 42,
+                      width: 42,
+                      child: Icon(
+                        Icons.close,
+                        color: AppColors.dark,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
 
-  Future<void> _openWhatsApp() async {
-  const phoneNumber = '447821391065';
-  const message = 'Hello Zine Travel, I need travel booking assistance.';
-
-  final Uri whatsappUrl = Uri.parse(
-    'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}',
-  );
-
-  if (!await launchUrl(
-    whatsappUrl,
-    mode: LaunchMode.externalApplication,
-  )) {
-    throw Exception('Could not open WhatsApp');
-  }
-}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: _buildDrawer(context),
+
       floatingActionButton: FloatingActionButton(
-    onPressed: _openWhatsApp,
-    backgroundColor: const Color(0xFF25D366),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(100),
-    ),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(100),
-      child: Image.asset("assets/images/whatsapp.png",))
-  ),
+        onPressed: _openWhatsApp,
+        backgroundColor: const Color(0xFF25D366),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(100),
+          child: Image.asset(
+            'assets/images/whatsapp.png',
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Column(
@@ -109,20 +183,37 @@ class _HomePageState extends State<HomePage> {
               onAbout: () => _scrollTo(_aboutKey),
               onServices: () => _scrollTo(_servicesKey),
               onContact: () => _scrollTo(_contactKey),
-              onRegister: () {},
+              onRegister: _openBecomeAgentPopup,
             ),
+
             HeroSection(
               onContact: () => _scrollTo(_contactKey),
-              onRegister: () {},
+              onRegister: _openBecomeAgentPopup,
             ),
-            // const StatsSection(),
-            
-            Container(child: const WelcomeSection()),
-            Container(key: _servicesKey, child: const ServicesSection()),
-            Container(key: _contactKey, child: const ContactSection()),
+
+            const WelcomeSection(),
+
+            // Removed BecomeAgentSection from main page.
+            // It will now open only as a popup.
+
+            Container(
+              key: _servicesKey,
+              child: const ServicesSection(),
+            ),
+
+            Container(
+              key: _contactKey,
+              child: const ContactSection(),
+            ),
+
             const CtaBanner(),
+
             const WhyChooseUs(),
-            Container(key: _aboutKey, child: const FooterSection()),
+
+            Container(
+              key: _aboutKey,
+              child: const FooterSection(),
+            ),
           ],
         ),
       ),
@@ -135,7 +226,9 @@ class _HomePageState extends State<HomePage> {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(color: AppColors.dark),
+            decoration: const BoxDecoration(
+              color: AppColors.dark,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
@@ -169,7 +262,7 @@ class _HomePageState extends State<HomePage> {
           _drawerItem('About Us', () => _scrollTo(_aboutKey)),
           _drawerItem('Services', () => _scrollTo(_servicesKey)),
           _drawerItem('Contact Us', () => _scrollTo(_contactKey)),
-          _drawerItem('Become Agent', () {}),
+          _drawerItem('Become Agent', _openBecomeAgentPopup),
         ],
       ),
     );
