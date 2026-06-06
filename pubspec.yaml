@@ -1,0 +1,33 @@
+name: zinetravel
+description: A Flutter web project integrated with Firebase for backend services.
+
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^2.10.0
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.8.0
+  provider: ^6.1.5
+  responsive_framework: ^1.5.0
+  google_fonts: ^6.2.1
+  url_launcher: ^6.3.2
+  http: ^1.6.0
+  intl_phone_number_input: ^0.7.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
