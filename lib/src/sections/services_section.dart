@@ -18,7 +18,7 @@ class _ServicesSectionState extends State<ServicesSection>
     ServiceData(
       title: 'Flight Booking',
       shortText: 'Best fares from trusted airlines worldwide.',
-      image: 'images/flight_booking.png',
+      image: 'assets/images/flight_booking.png',
       icon: Icons.flight_takeoff,
       heading:
           'Find the best rates for both domestic and international flights.',
@@ -35,7 +35,7 @@ class _ServicesSectionState extends State<ServicesSection>
     ServiceData(
       title: 'Hotel Booking',
       shortText: 'Book domestic and international hotels easily.',
-      image: 'images/hotel_booking.png',
+      image: 'assets/images/hotel_booking.png',
       icon: Icons.hotel,
       heading:
           'Domestic and international hotels available on one simple platform.',
@@ -52,7 +52,7 @@ class _ServicesSectionState extends State<ServicesSection>
     ServiceData(
       title: 'Group Booking',
       shortText: 'Flexible travel solutions for groups of all sizes.',
-      image: 'images/group_image.png',
+      image: 'assets/images/group_image.png',
       icon: Icons.groups,
       heading: 'Group bookings made simple for all group sizes.',
       description:
