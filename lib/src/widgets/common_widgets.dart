@@ -4,33 +4,62 @@ import 'package:flutter/services.dart';
 import '../theme/colors.dart';
 
 class Logo extends StatelessWidget {
-  const Logo({super.key});
+  final double iconSize;
+  final double fontSize;
+  final bool showText;
+
+  const Logo({
+    super.key,
+    this.iconSize = 46,
+    this.fontSize = 24,
+    this.showText = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          height: 42,
-          width: 42,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(
-            Icons.flight_takeoff,
-            color: Colors.white,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.asset(
+            'assets/images/logo.png',
+            height: iconSize,
+            width: iconSize,
+            fit: BoxFit.contain,
+
+            // Safe fallback if logo image is missing or failed to load
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                height: iconSize,
+                width: iconSize,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.flight_takeoff,
+                  color: Colors.white,
+                  size: iconSize * 0.55,
+                ),
+              );
+            },
           ),
         ),
-        const SizedBox(width: 10),
-        const Text(
-          'Zine Travel',
-          style: TextStyle(
-            color: AppColors.primary,
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
+
+        if (showText) ...[
+          const SizedBox(width: 10),
+          Text(
+            'Zine Travel',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: AppColors.primary,
+              fontSize: fontSize,
+              fontWeight: FontWeight.w800,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -536,12 +565,12 @@ class FooterColumn extends StatelessWidget {
 
   Future<void> copyText(BuildContext context, String text) async {
     await Clipboard.setData(
-      ClipboardData(text: text),
+      ClipboardData(text: text.split(": ").last),
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Copied: $text'),
+        content: Text('Copied: ${text.split(": ").last}'),
         duration: const Duration(seconds: 2),
       ),
     );
