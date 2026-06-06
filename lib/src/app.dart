@@ -206,7 +206,9 @@ class _HomePageState extends State<HomePage> {
               child: const ContactSection(),
             ),
 
-            const CtaBanner(),
+            CtaBanner(
+              onBecomeAgent: _openBecomeAgentPopup,
+            ),
 
             const WhyChooseUs(),
 

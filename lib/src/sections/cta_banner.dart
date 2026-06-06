@@ -4,7 +4,9 @@ import '../theme/colors.dart';
 import '../widgets/common_widgets.dart';
 
 class CtaBanner extends StatelessWidget {
-  const CtaBanner({super.key});
+  final VoidCallback onBecomeAgent;
+
+  const CtaBanner({super.key, required this.onBecomeAgent});
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +47,8 @@ class CtaBanner extends StatelessWidget {
             ),
             const SizedBox(height: 36),
             PrimaryButton(
-              text: 'Launch Agent Portal',
-              onTap: () {},
+              text: 'Become Agent',
+              onTap: onBecomeAgent,
             ),
           ],
         ),

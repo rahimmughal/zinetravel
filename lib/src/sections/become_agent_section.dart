@@ -353,34 +353,6 @@ class _BecomeAgentSectionState extends State<BecomeAgentSection> {
               ),
             ),
           ),
-
-          const SizedBox(height: 18),
-
-          Center(
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              children: [
-                const Text(
-                  'Already have an account? ',
-                  style: TextStyle(
-                    color: AppColors.muted,
-                    fontSize: 14,
-                  ),
-                ),
-                InkWell(
-                  onTap: () {},
-                  child: const Text(
-                    'Sign in',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
