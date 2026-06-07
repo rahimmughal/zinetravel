@@ -50,8 +50,8 @@ class FooterSection extends StatelessWidget {
                   canCopy: true,
                   items: [
                     'Email: zinetravelltd@outlook.com',
-                    'Phone: 0128 2901770',
-                    'WhatsApp: +44 7821 391065',
+                    'Phone: +44 7821 391065',
+                    'WhatsApp: +44 128 2901770 ',
                     'Company Number: 14008504',
                     'Office Address: 200a Every St, Nelson BB9 7JB, UK',
                   ],
